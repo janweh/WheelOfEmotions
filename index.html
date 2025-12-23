@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plutchik's Wheel of Emotions</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Plutchik's Wheel of Emotions</h1>
+            <p class="subtitle">Explore emotions interactively</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="wheel">Emotion Wheel</button>
+            <button class="tab-button" data-tab="questionnaire">Find My Emotion</button>
+        </div>
+
+        <div class="content">
+            <!-- Wheel View -->
+            <div id="wheel-view" class="tab-content active">
+                <div class="wheel-container">
+                    <svg id="emotion-wheel" viewBox="0 0 800 800"></svg>
+                </div>
+                <div id="emotion-details" class="emotion-details hidden">
+                    <button class="close-btn">&times;</button>
+                    <h2 id="emotion-name"></h2>
+                    <div class="emotion-info">
+                        <div class="info-section">
+                            <h3>Definition</h3>
+                            <p id="emotion-definition"></p>
+                        </div>
+                        <div class="info-section">
+                            <h3>Example</h3>
+                            <p id="emotion-example"></p>
+                        </div>
+                        <div class="info-section" id="intensity-info">
+                            <h3>Intensity Variations</h3>
+                            <p id="emotion-intensity"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questionnaire View -->
+            <div id="questionnaire-view" class="tab-content">
+                <div class="questionnaire-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div id="question-container">
+                        <h2 id="question-text"></h2>
+                        <div id="answers-container"></div>
+                    </div>
+                    <div id="result-container" class="hidden">
+                        <h2>Your Emotion</h2>
+                        <div id="result-emotion"></div>
+                        <button id="restart-btn" class="primary-btn">Start Over</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="emotions.js"></script>
+    <script src="wheel.js"></script>
+    <script src="questionnaire.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

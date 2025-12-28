@@ -2,11 +2,11 @@
 class EmotionWheel {
     constructor(svgElement) {
         this.svg = svgElement;
-        this.centerX = 400;
-        this.centerY = 400;
-        this.innerRadius = 80;
-        this.middleRadius = 160;
-        this.outerRadius = 300;
+        this.centerX = 500;
+        this.centerY = 500;
+        this.innerRadius = 100;
+        this.middleRadius = 200;
+        this.outerRadius = 350;
         this.primaryEmotions = getPrimaryEmotions();
         this.init();
     }
@@ -19,6 +19,9 @@ class EmotionWheel {
         // Clear existing content
         this.svg.innerHTML = '';
 
+        // Update viewBox for larger wheel
+        this.svg.setAttribute('viewBox', '0 0 1000 1000');
+
         const emotionOrder = ['joy', 'anticipation', 'anger', 'disgust', 'sadness', 'surprise', 'fear', 'trust'];
         const angleStep = (Math.PI * 2) / 8;
 
@@ -26,61 +29,73 @@ class EmotionWheel {
             const emotion = EMOTIONS[emotionKey];
             const startAngle = index * angleStep - Math.PI / 2;
             const endAngle = (index + 1) * angleStep - Math.PI / 2;
+            const midAngle = (startAngle + endAngle) / 2;
 
             // Draw three intensity levels for each emotion
             this.drawSegment(startAngle, endAngle, this.middleRadius, this.outerRadius, emotion.color, emotion, 'high');
             this.drawSegment(startAngle, endAngle, this.innerRadius, this.middleRadius, this.lightenColor(emotion.color, 0.3), emotion, 'medium');
             this.drawSegment(startAngle, endAngle, 0, this.innerRadius, this.lightenColor(emotion.color, 0.6), emotion, 'low');
 
-            // Add label
-            const midAngle = (startAngle + endAngle) / 2;
-            const labelRadius = this.outerRadius + 30;
-            const labelX = this.centerX + Math.cos(midAngle) * labelRadius;
-            const labelY = this.centerY + Math.sin(midAngle) * labelRadius;
+            // Add labels for each intensity level
+            // Outer ring label (high intensity)
+            this.addTextLabel(
+                midAngle,
+                (this.middleRadius + this.outerRadius) / 2,
+                emotion.intensity.high.toUpperCase(),
+                '16',
+                '#333'
+            );
 
-            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            label.setAttribute('x', labelX);
-            label.setAttribute('y', labelY);
-            label.setAttribute('text-anchor', 'middle');
-            label.setAttribute('dominant-baseline', 'middle');
-            label.setAttribute('class', 'emotion-label');
-            label.setAttribute('fill', '#333');
-            label.textContent = emotion.name.toUpperCase();
-            this.svg.appendChild(label);
+            // Middle ring label (medium intensity)
+            this.addTextLabel(
+                midAngle,
+                (this.innerRadius + this.middleRadius) / 2,
+                emotion.intensity.medium.toUpperCase(),
+                '14',
+                '#333'
+            );
+
+            // Inner ring label (low intensity)
+            this.addTextLabel(
+                midAngle,
+                this.innerRadius / 2,
+                emotion.intensity.low.toUpperCase(),
+                '12',
+                '#555'
+            );
         });
 
         // Add center circle
         const centerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         centerCircle.setAttribute('cx', this.centerX);
         centerCircle.setAttribute('cy', this.centerY);
-        centerCircle.setAttribute('r', this.innerRadius * 0.8);
+        centerCircle.setAttribute('r', this.innerRadius * 0.15);
         centerCircle.setAttribute('fill', '#f8f9fa');
         centerCircle.setAttribute('stroke', '#dee2e6');
         centerCircle.setAttribute('stroke-width', '2');
         this.svg.appendChild(centerCircle);
+    }
 
-        // Add center text
-        const centerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        centerText.setAttribute('x', this.centerX);
-        centerText.setAttribute('y', this.centerY);
-        centerText.setAttribute('text-anchor', 'middle');
-        centerText.setAttribute('dominant-baseline', 'middle');
-        centerText.setAttribute('class', 'emotion-label');
-        centerText.setAttribute('fill', '#666');
-        centerText.setAttribute('font-size', '12');
-        centerText.textContent = 'Click any';
-        this.svg.appendChild(centerText);
+    addTextLabel(angle, radius, text, fontSize, fill) {
+        const x = this.centerX + Math.cos(angle) * radius;
+        const y = this.centerY + Math.sin(angle) * radius;
 
-        const centerText2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        centerText2.setAttribute('x', this.centerX);
-        centerText2.setAttribute('y', this.centerY + 15);
-        centerText2.setAttribute('text-anchor', 'middle');
-        centerText2.setAttribute('dominant-baseline', 'middle');
-        centerText2.setAttribute('class', 'emotion-label');
-        centerText2.setAttribute('fill', '#666');
-        centerText2.setAttribute('font-size', '12');
-        centerText2.textContent = 'emotion';
-        this.svg.appendChild(centerText2);
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', x);
+        label.setAttribute('y', y);
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('dominant-baseline', 'middle');
+        label.setAttribute('class', 'emotion-label');
+        label.setAttribute('fill', fill);
+        label.setAttribute('font-size', fontSize);
+        label.setAttribute('font-weight', '600');
+        label.textContent = text;
+
+        // Rotate text to follow the arc
+        const rotationAngle = (angle * 180 / Math.PI);
+        label.setAttribute('transform', `rotate(${rotationAngle}, ${x}, ${y})`);
+
+        this.svg.appendChild(label);
     }
 
     drawSegment(startAngle, endAngle, innerRadius, outerRadius, color, emotion, intensity) {
